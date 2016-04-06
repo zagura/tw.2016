@@ -1,8 +1,8 @@
 package agh.tw2016;
 
 public class Main {
-    public static int cThreads = 10;
-    public static int portion = 10;
+    public static int cThreads = 20;
+    public static int portion = 1;
     public static void main(String[] args) {
 
         Monitor monitor = new Monitor();
