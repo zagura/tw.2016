@@ -10,17 +10,21 @@ import static java.lang.Thread.sleep;
 public class Consument extends Thread implements Runnable {
     private final Monitor m;
     private Random r;
-    public Consument(Monitor m){
+    private PortionBuffer buffer;
+    public Consument(Monitor m, PortionBuffer buff){
         super();
         this.m = m;
         this.r = new Random();
+        this.buffer = buff;
     }
     public void run() {
         while (true) {
 
-            m.read(getId());
+            int index = m.read();
+            buffer.take(index);
+            m.freeIt(index);
             try {
-                sleep(r.nextInt(1));
+                sleep(r.nextInt(2));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

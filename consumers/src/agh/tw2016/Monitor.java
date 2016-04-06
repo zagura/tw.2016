@@ -6,17 +6,30 @@ import java.util.*;
  * Created by student10 on 2016-03-31.
  */
 public class Monitor {
-    private int bufor;
-    private final int size = 2*Main.portion;
+    private final int size;
+    boolean completed[];
+    boolean free[];
+    private int insert_index;
+    private int read_index;
+    private int count;
     boolean busy;
     private Random r;
-    public Monitor(){
+    public Monitor(int size){
         busy = false;
-        bufor = 0;
+        this.size = size;
         r = new Random();
+        count = 0;
+        read_index = 0;
+        insert_index = 0;
+        free = new boolean[size];
+        completed = new boolean[size];
+        for(int i = 0; i < size; i++){
+            free[i] = true;
+            completed[i] = false;
+        }
     }
-    public synchronized void increment(long id){
-        while(busy || bufor >= size){
+    public synchronized int increment(){
+        while(busy || !free[insert_index]){
             try {
                 wait();
 
@@ -25,38 +38,59 @@ public class Monitor {
             }
         }
         busy = true;
-        int m = Main.portion;
-        if(size - bufor < m) m = size - bufor;
-        m--;
-        if(m > 0){
-            bufor += r.nextInt(m) + 1;
-        }else{
-            bufor++;
+        insert_index++;
+        int index = insert_index - 1;
+        free[index] = false;
+        insert_index %= size;
+        busy = false;
+        notifyAll();
+        return index;
+    }
+    public synchronized int read(){
+        while(busy || !completed[read_index] ){
+            try {
+                wait();
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        System.out.println("ID: " + id + " add\t" + bufor);
+
+        busy = true;
+        int index = read_index;
+        read_index++;
+        read_index %= size;
+        busy = false;
+        notifyAll();
+        return index;
+    }
+    public synchronized void confirm(int index){
+        while(busy){
+            try {
+                wait();
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        busy = true;
+        completed[index] = true;
         busy = false;
         notifyAll();
     }
-    public synchronized void read(long id){
-        while(busy || bufor <= 0){
+    public synchronized void freeIt(int index){
+        while(busy){
             try {
                 wait();
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
         busy = true;
-        int m = Main.portion;
-        if(bufor < m) m = bufor;
-        m--;
-        if(m > 0){
-            bufor -= r.nextInt(m) +1;
-        }else{
-            bufor--;
-        }
-        System.out.println("ID: " + id + " consume\t" + bufor);
+        free[index] = true;
+        completed[index] = false;
         busy = false;
         notifyAll();
     }
