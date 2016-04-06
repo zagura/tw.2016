@@ -15,6 +15,7 @@ public class PortionBuffer {
     }
 
     public void insert(long val, int index){
+        if(index == -1) index++;
         if(index < size){
             buffer[index] = val;
             index++;
@@ -30,8 +31,8 @@ public class PortionBuffer {
         if(index >= size) index = size-1;
         long res = buffer[index];
         buffer[index] = 0;
-        index--;
         System.out.println("ID: " + res + " consume\t" + index);
+        index--;
         try {
             sleep(100);
         } catch (InterruptedException e) {

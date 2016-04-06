@@ -1,7 +1,7 @@
 package agh.tw2016;
 
 public class Main {
-    public static int cThreads = 5;
+    public static int cThreads = 15;
     public static int portion = 10;
     public static void main(String[] args) {
         PortionBuffer buffer = new PortionBuffer(portion);
@@ -14,7 +14,7 @@ public class Main {
             producers[i].start();
      //       consumers[i].start();
         }
-        Consument c = new Consument(monitor);
+        Thread c = new Consument(monitor);
         c.start();
         for (int i = 0; i < cThreads; i++) {
             try {
@@ -24,6 +24,10 @@ public class Main {
                 e.printStackTrace();
             }
         }
-        c.join();
+        try {
+            c.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

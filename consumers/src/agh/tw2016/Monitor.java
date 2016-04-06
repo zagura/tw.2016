@@ -36,7 +36,7 @@ public class Monitor {
         notifyAll();
     }
     public synchronized void read(long id){
-        while(busy){
+        while(busy || index < 0){
             try {
                 wait();
 
